@@ -3,23 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Benedict John Lazo — QA Automation Engineer based in Manila, Philippines. 3+ years in software testing and test automation across web and enterprise applications." />
-  <title>Benedict John Lazo — QA Automation Engineer</title>
+  <meta name="description" content="Benedict John Lazo is a QA Automation Engineer based in Manila, Philippines, with 3+ years in software testing and test automation using Python, Robot Framework, Selenium, and Playwright." />
+  <meta name="author" content="Benedict John Lazo" />
+  <meta name="keywords" content="Benedict John Lazo, Benedict Lazo, QA Automation Engineer, Software Test Engineer, Test Automation, Manila, Philippines, Robot Framework, Playwright, Selenium" />
+  <title>Benedict John Lazo | QA Automation Engineer Portfolio</title>
 
+  <link rel="canonical" href="https://supcalli.github.io/" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0f14" />
 
   <!-- Open Graph / social preview -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Benedict John Lazo — QA Automation Engineer" />
+  <meta property="og:url" content="https://supcalli.github.io/" />
+  <meta property="og:site_name" content="Benedict John Lazo — Portfolio" />
+  <meta property="og:title" content="Benedict John Lazo | QA Automation Engineer" />
   <meta property="og:description" content="QA Automation Engineer with 3+ years in software testing and test automation across web and enterprise applications." />
-  <meta property="og:image" content="assets/benedict.jpg" />
+  <meta property="og:image" content="https://supcalli.github.io/assets/benedict.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Benedict John Lazo — QA Automation Engineer" />
+  <meta name="twitter:title" content="Benedict John Lazo | QA Automation Engineer" />
   <meta name="twitter:description" content="QA Automation Engineer with 3+ years in software testing and test automation." />
+  <meta name="twitter:image" content="https://supcalli.github.io/assets/benedict.jpg" />
+
+  <!-- Structured data: helps Google understand who you are -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Benedict John Lazo",
+    "alternateName": "Benedict Lazo",
+    "jobTitle": "QA Automation Engineer",
+    "url": "https://supcalli.github.io/",
+    "image": "https://supcalli.github.io/assets/benedict.jpg",
+    "email": "mailto:benzrodrigo07@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Manila",
+      "addressCountry": "Philippines"
+    },
+    "sameAs": [
+      "https://www.linkedin.com/in/benedict-lazo-40b88422a/",
+      "https://github.com/SupCalli"
+    ],
+    "knowsAbout": [
+      "QA Automation",
+      "Software Testing",
+      "Test Automation",
+      "Python",
+      "Robot Framework",
+      "Selenium",
+      "Playwright",
+      "CI/CD"
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Apply theme before paint to avoid a flash
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var sysLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        var theme = saved || (sysLight ? "light" : "dark");
+        if (theme === "light") document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -39,6 +90,10 @@
   <header class="site-header" id="top">
     <nav class="nav" aria-label="Primary">
       <a href="#top" class="nav__brand">BJL<span>.</span></a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
+        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀️</span>
+        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">🌙</span>
+      </button>
       <button class="nav__toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
@@ -400,16 +455,50 @@
 
     <!-- CONTACT -->
     <section class="section" id="contact" aria-labelledby="contact-heading">
-      <div class="section__inner contact" data-reveal>
+      <div class="section__inner" data-reveal>
         <p class="section__kicker">07 — Contact</p>
         <h2 class="section__title" id="contact-heading">Let's work together</h2>
-        <p class="contact__lead">
-          Open to QA automation and software test engineering roles. The fastest way to
-          reach me is email — I'm happy to share a full CV on request.
-        </p>
-        <div class="contact__links">
-          <a class="btn btn--primary" href="mailto:benzrodrigo07@gmail.com">benzrodrigo07@gmail.com</a>
-          <a class="btn btn--ghost" href="tel:+639669978081">0966 997 8081</a>
+        <div class="contact__grid">
+          <div class="contact__info">
+            <p class="contact__lead">
+              Open to QA automation and software test engineering roles. Have a question,
+              an opportunity, or just want to say hi? Drop me a message and I'll get back to you.
+            </p>
+            <ul class="contact__details">
+              <li>
+                <span class="contact__icon" aria-hidden="true">✉️</span>
+                <a href="mailto:benzrodrigo07@gmail.com">benzrodrigo07@gmail.com</a>
+              </li>
+              <li>
+                <span class="contact__icon" aria-hidden="true">📱</span>
+                <a href="tel:+639669978081">0966 997 8081</a>
+              </li>
+              <li>
+                <span class="contact__icon" aria-hidden="true">📍</span>
+                <span>Manila, Philippines</span>
+              </li>
+            </ul>
+          </div>
+
+          <form class="contact__form" id="contactForm"
+                action="https://formspree.io/f/maeepqea" method="POST" novalidate>
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input type="text" id="cf-name" name="name" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input type="email" id="cf-email" name="email" autocomplete="email" required />
+            </div>
+            <div class="field">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary contact__submit">
+              <span class="contact__submit-label">Send message</span>
+            </button>
+            <p class="contact__status" id="contactStatus" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </section>

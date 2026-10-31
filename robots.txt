@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://supcalli.github.io/sitemap.xml

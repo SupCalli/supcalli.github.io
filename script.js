@@ -37,6 +37,35 @@ if (toggle && menu) {
 const yearEl = document.getElementById("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+// ---------- Theme toggle (light / dark) ----------
+const themeToggle = document.getElementById("themeToggle");
+const syncToggleState = () => {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  if (themeToggle) {
+    themeToggle.setAttribute("aria-pressed", String(isLight));
+    themeToggle.setAttribute(
+      "aria-label",
+      isLight ? "Switch to dark mode" : "Switch to light mode"
+    );
+  }
+};
+syncToggleState();
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+    if (isLight) {
+      document.documentElement.removeAttribute("data-theme");
+      try { localStorage.setItem("theme", "dark"); } catch (e) {}
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+      try { localStorage.setItem("theme", "light"); } catch (e) {}
+    }
+    syncToggleState();
+    // update hero particle color if the canvas is running
+    if (window.__setParticleTheme) window.__setParticleTheme();
+  });
+}
+
 // ---------- Typing effect ----------
 const typedEl = document.querySelector("[data-typed]");
 if (typedEl) {
@@ -137,6 +166,16 @@ if (canvas && !prefersReduced) {
     linkDist: 130,
     speed: 0.35,
     color: "79, 209, 197",
+  };
+
+  // keep particle color in sync with the active theme's accent
+  const readAccentRGB = () => {
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+    return isLight ? "13, 148, 136" : "79, 209, 197";
+  };
+  config.color = readAccentRGB();
+  window.__setParticleTheme = () => {
+    config.color = readAccentRGB();
   };
 
   function resize() {
@@ -486,4 +525,73 @@ if (consoleEl) {
       run();
     }
   }
+}
+
+// ---------- Contact form ----------
+const contactForm = document.getElementById("contactForm");
+if (contactForm) {
+  const statusEl = document.getElementById("contactStatus");
+  const submitBtn = contactForm.querySelector(".contact__submit");
+  const labelEl = contactForm.querySelector(".contact__submit-label");
+  const defaultLabel = labelEl ? labelEl.textContent : "Send message";
+
+  const setStatus = (msg, type) => {
+    statusEl.textContent = msg;
+    statusEl.classList.remove("is-success", "is-error");
+    if (type) statusEl.classList.add(`is-${type}`);
+  };
+
+  contactForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // native validation first
+    if (!contactForm.checkValidity()) {
+      contactForm.reportValidity();
+      return;
+    }
+
+    const action = contactForm.getAttribute("action") || "";
+    const name = contactForm.querySelector("#cf-name").value.trim();
+    const email = contactForm.querySelector("#cf-email").value.trim();
+    const message = contactForm.querySelector("#cf-message").value.trim();
+
+    // Fallback if the Formspree endpoint hasn't been configured yet:
+    // open the visitor's mail client pre-filled.
+    if (action.includes("YOUR_FORM_ID") || !action) {
+      const subject = encodeURIComponent(`Portfolio message from ${name}`);
+      const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+      window.location.href = `mailto:benzrodrigo07@gmail.com?subject=${subject}&body=${body}`;
+      setStatus("Opening your email app…", "success");
+      return;
+    }
+
+    // Submit via fetch to Formspree
+    submitBtn.setAttribute("disabled", "true");
+    if (labelEl) labelEl.textContent = "Sending…";
+    setStatus("");
+
+    try {
+      const res = await fetch(action, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(contactForm),
+      });
+      if (res.ok) {
+        contactForm.reset();
+        setStatus("Thanks! Your message has been sent. I'll get back to you soon.", "success");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        const msg =
+          data && data.errors && data.errors.length
+            ? data.errors.map((x) => x.message).join(", ")
+            : "Something went wrong. Please email me directly.";
+        setStatus(msg, "error");
+      }
+    } catch (err) {
+      setStatus("Network error. Please email me directly at benzrodrigo07@gmail.com.", "error");
+    } finally {
+      submitBtn.removeAttribute("disabled");
+      if (labelEl) labelEl.textContent = defaultLabel;
+    }
+  });
 }
