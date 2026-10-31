@@ -13,6 +13,7 @@
   --hero-title-grad: linear-gradient(120deg, #fff 20%, var(--accent) 50%, var(--accent-2) 70%, #fff 100%);
   --shadow-strong: rgba(0, 0, 0, 0.45);
   --header-bg: rgba(11, 15, 20, 0.82);
+  --badge-bg: rgba(22, 29, 39, 0.85);
   --radius: 14px;
   --radius-sm: 9px;
   --maxw: 1080px;
@@ -34,6 +35,7 @@
   --hero-title-grad: linear-gradient(120deg, #0f1b26 20%, var(--accent) 50%, var(--accent-2) 70%, #0f1b26 100%);
   --shadow-strong: rgba(15, 27, 38, 0.14);
   --header-bg: rgba(246, 248, 251, 0.82);
+  --badge-bg: rgba(255, 255, 255, 0.9);
 }
 
 /* ---------- Base ---------- */
@@ -641,7 +643,7 @@ h1, h2, h3 { line-height: 1.2; margin: 0; }
   font-family: var(--mono);
   font-size: 0.78rem;
   color: var(--text);
-  background: rgba(22, 29, 39, 0.85);
+  background: var(--badge-bg);
   border: 1px solid var(--border);
   padding: 7px 13px;
   border-radius: 999px;
