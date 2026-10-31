@@ -61,9 +61,43 @@ CV. Static site (HTML/CSS/JS), deployed to GitHub Pages.
   swap for real suite names.
 - Light/dark theme toggle (nav): sun/moon icons, saved to localStorage, defaults to system
   preference, applied pre-paint via inline head script to avoid flash. Particle color adapts.
+- Animation polish (added later): hero name has an animated gradient shimmer (titleShimmer,
+  white→accent→accent-2, 220% background-size, 8s loop); skill & project cards do a subtle 3D
+  tilt-toward-cursor on hover (max 7deg, resets on mouseleave, fine-pointer + non-reduced-motion
+  only). Odometer-style counters were considered but skipped — the existing eased count-up is
+  enough for the small numbers (3/5/2).
 - Contact form: posts to Formspree endpoint https://formspree.io/f/maeepqea with fetch,
   validation, loading state, success/error messages. Falls back to mailto if endpoint missing.
   Tested working end-to-end.
+- Copy-email button (contact section): copy-btn next to the email copies it to clipboard
+  (navigator.clipboard with execCommand fallback) and shows a bottom-center toast
+  ("Email copied to clipboard ✓"). Uses [data-copy] so it can be reused on other values.
+- Smooth theme fade: body + themed surfaces transition background-color/color/border-color
+  over 0.35s so light/dark switching crossfades instead of snapping.
+- View Transitions theme wipe: theme toggle uses document.startViewTransition for a circular
+  clip-path reveal (themeWipe keyframe) originating from the toggle/click point via --vt-x/y/r
+  CSS vars set in JS. Falls back to instant setTheme if unsupported or reduced motion.
+- Keyboard shortcut: press "T" toggles the theme (ignored while focused in input/textarea/
+  contenteditable). Wipe originates from the toggle button center.
+
+- KEPT tasteful extras: timeline draw-in (gradient line on .timeline::before scales Y 0→1 when
+  the section gets .is-visible); button shine sweep (.btn::after light streak on hover,
+  btnShine keyframe); hero scroll parallax (portrait drifts 0.12x, canvas 0.06x, fine-pointer +
+  non-reduced only); confetti easter egg (type "pass" anywhere, or auto-fires once when the
+  test console first finishes; window.__celebrate() exposed; confettiFall keyframe; "All tests
+  passed ✓" toast); odometer counters on the About stats (vertical reel roll); side dot-nav
+  (right-edge dots per section, labels on hover, synced via scroll-spy setActive, hidden
+  <=980px) — KEPT at owner's request.
+- REMOVED after trial: grain/noise overlay (barely visible, not worth it). Also earlier:
+  staggered hero letter reveal (broke the gradient-clip name + mid-word wrapping) and the fancy
+  ring/glow/zoom intro (reverted to the simple BJL draw-in per owner preference).
+
+### Polish list status (from the options menu)
+Done: copy-email toast, smooth theme fade, card tilt (skill+project), hero name gradient
+shimmer, View Transitions theme wipe, "T" keyboard shortcut.
+Deliberately skipped: odometer counters (gimmicky for 3/5/2), staggered hero letter reveal
+(hero already busy), noise/grain overlay (risk of looking dirty), side dot-nav (duplicates the
+existing top-nav scroll-spy).
 
 ## SEO / Search Console status
 

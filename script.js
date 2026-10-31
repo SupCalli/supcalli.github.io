@@ -50,21 +50,65 @@ const syncToggleState = () => {
   }
 };
 syncToggleState();
+
+// Flip the theme attribute + persist + sync dependent bits
+const setTheme = (toLight) => {
+  if (toLight) {
+    document.documentElement.setAttribute("data-theme", "light");
+    try { localStorage.setItem("theme", "light"); } catch (e) {}
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+    try { localStorage.setItem("theme", "dark"); } catch (e) {}
+  }
+  syncToggleState();
+  if (window.__setParticleTheme) window.__setParticleTheme();
+};
+
+// Toggle, using the View Transitions API for a circular wipe from the origin point
+const toggleTheme = (originX, originY) => {
+  const goingLight = document.documentElement.getAttribute("data-theme") !== "light";
+
+  const supportsVT =
+    typeof document.startViewTransition === "function" && !prefersReduced;
+
+  if (!supportsVT) {
+    setTheme(goingLight);
+    return;
+  }
+
+  // position the circular reveal at the click/toggle origin
+  const x = originX ?? window.innerWidth - 40;
+  const y = originY ?? 40;
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y)
+  );
+  document.documentElement.style.setProperty("--vt-x", `${x}px`);
+  document.documentElement.style.setProperty("--vt-y", `${y}px`);
+  document.documentElement.style.setProperty("--vt-r", `${endRadius}px`);
+
+  document.startViewTransition(() => setTheme(goingLight));
+};
+
 if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    const isLight = document.documentElement.getAttribute("data-theme") === "light";
-    if (isLight) {
-      document.documentElement.removeAttribute("data-theme");
-      try { localStorage.setItem("theme", "dark"); } catch (e) {}
-    } else {
-      document.documentElement.setAttribute("data-theme", "light");
-      try { localStorage.setItem("theme", "light"); } catch (e) {}
-    }
-    syncToggleState();
-    // update hero particle color if the canvas is running
-    if (window.__setParticleTheme) window.__setParticleTheme();
+  themeToggle.addEventListener("click", (e) => {
+    toggleTheme(e.clientX, e.clientY);
   });
 }
+
+// Keyboard shortcut: press "T" to toggle theme (ignored while typing in a field)
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() !== "t" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = (e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
+  let ox, oy;
+  if (themeToggle) {
+    const r = themeToggle.getBoundingClientRect();
+    ox = r.left + r.width / 2;
+    oy = r.top + r.height / 2;
+  }
+  toggleTheme(ox, oy);
+});
 
 // ---------- Typing effect ----------
 const typedEl = document.querySelector("[data-typed]");
@@ -266,9 +310,13 @@ const sections = navLinks
   .filter(Boolean);
 
 if (sections.length) {
+  const dotLinks = Array.from(document.querySelectorAll(".dot-nav a"));
   const setActive = (id) => {
     navLinks.forEach((l) =>
       l.classList.toggle("is-active", l.getAttribute("href") === `#${id}`)
+    );
+    dotLinks.forEach((d) =>
+      d.classList.toggle("is-active", d.getAttribute("data-dot") === id)
     );
   };
 
@@ -297,25 +345,44 @@ if (sections.length) {
   spyUpdate();
 }
 
-// ---------- Count-up stats ----------
+// ---------- Count-up stats (odometer reel) ----------
 const counters = document.querySelectorAll("[data-count]");
 if (counters.length) {
   const runCount = (el) => {
     const target = parseInt(el.dataset.count, 10);
     const suffix = el.dataset.suffix || "";
+
     if (prefersReduced) {
       el.textContent = target + suffix;
       return;
     }
-    const duration = 1200;
-    const start = performance.now();
-    const frame = (now) => {
-      const p = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
-      el.textContent = Math.round(eased * target) + suffix;
-      if (p < 1) requestAnimationFrame(frame);
-    };
-    requestAnimationFrame(frame);
+
+    // Build an odometer reel: a strip of 0..target that slides up to land on target.
+    // (Single-digit targets here, so one reel per number.)
+    el.innerHTML = "";
+    const reel = document.createElement("span");
+    reel.className = "odometer";
+    const strip = document.createElement("span");
+    strip.className = "odometer__strip";
+    for (let n = 0; n <= target; n++) {
+      const d = document.createElement("span");
+      d.className = "odometer__digit";
+      d.textContent = String(n);
+      strip.appendChild(d);
+    }
+    reel.appendChild(strip);
+    el.appendChild(reel);
+    if (suffix) {
+      const suf = document.createElement("span");
+      suf.className = "odometer__suffix";
+      suf.textContent = suffix;
+      el.appendChild(suf);
+    }
+
+    // trigger the slide on next frame so the transition runs
+    requestAnimationFrame(() => {
+      strip.style.transform = `translateY(-${target}em)`;
+    });
   };
 
   if ("IntersectionObserver" in window) {
@@ -394,6 +461,7 @@ if (glow && finePointer && !prefersReduced) {
 
 // ---------- Card gradient-glow follow ----------
 if (finePointer) {
+  // cards that get the cursor-follow glow
   document
     .querySelectorAll(".skill-card, .project-card, .education__card, .interest-card")
     .forEach((card) => {
@@ -403,6 +471,23 @@ if (finePointer) {
         card.style.setProperty("--my", `${e.clientY - r.top}px`);
       });
     });
+
+  // subtle 3D tilt toward the cursor on skill & project cards
+  if (!prefersReduced) {
+    const TILT = 7; // max degrees
+    document.querySelectorAll(".skill-card, .project-card").forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform =
+          `perspective(700px) rotateY(${px * TILT}deg) rotateX(${-py * TILT}deg) translateY(-3px)`;
+      });
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  }
 }
 
 // ---------- Magnetic buttons ----------
@@ -501,6 +586,12 @@ if (consoleEl) {
       out += `<span class="c-dim">${rule}</span>`;
       consoleEl.innerHTML = out + " " + caret;
 
+      // celebrate once, the first time the suite finishes
+      if (!window.__consoleCelebrated && typeof window.__celebrate === "function") {
+        window.__consoleCelebrated = true;
+        window.__celebrate();
+      }
+
       // 5) hold, then loop
       await sleep(3600);
       run();
@@ -595,3 +686,102 @@ if (contactForm) {
     }
   });
 }
+
+// ---------- Copy email to clipboard + toast ----------
+const toastEl = document.getElementById("toast");
+let toastTimer = null;
+const showToast = (msg) => {
+  if (!toastEl) return;
+  toastEl.textContent = msg;
+  toastEl.classList.add("is-shown");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("is-shown"), 2200);
+};
+
+document.querySelectorAll("[data-copy]").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const text = btn.getAttribute("data-copy");
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      // fallback for older/non-secure contexts
+      const tmp = document.createElement("textarea");
+      tmp.value = text;
+      tmp.style.position = "fixed";
+      tmp.style.opacity = "0";
+      document.body.appendChild(tmp);
+      tmp.select();
+      try { document.execCommand("copy"); } catch (_) {}
+      document.body.removeChild(tmp);
+    }
+    btn.classList.add("is-copied");
+    setTimeout(() => btn.classList.remove("is-copied"), 1500);
+    showToast("Email copied to clipboard ✓");
+  });
+});
+
+// ---------- Hero scroll parallax ----------
+const heroPortrait = document.querySelector(".hero__portrait");
+const heroCanvasEl = document.querySelector(".hero__canvas");
+if ((heroPortrait || heroCanvasEl) && !prefersReduced && window.matchMedia("(pointer: fine)").matches) {
+  let ticking = false;
+  const onParallax = () => {
+    const y = window.scrollY;
+    if (y < 900) {
+      if (heroPortrait) heroPortrait.style.transform = `translateY(${y * 0.12}px)`;
+      if (heroCanvasEl) heroCanvasEl.style.transform = `translateY(${y * 0.06}px)`;
+    }
+    ticking = false;
+  };
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onParallax);
+      }
+    },
+    { passive: true }
+  );
+}
+
+// ---------- Confetti easter egg (QA "all tests passed") ----------
+(function () {
+  if (prefersReduced) return;
+
+  const fire = () => {
+    const colors = ["#4fd1c5", "#6ea8fe", "#a78bfa", "#ffffff"];
+    const count = 90;
+    const container = document.createElement("div");
+    container.className = "confetti";
+    document.body.appendChild(container);
+
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("i");
+      piece.style.left = Math.random() * 100 + "vw";
+      piece.style.background = colors[(Math.random() * colors.length) | 0];
+      piece.style.animationDelay = Math.random() * 0.3 + "s";
+      piece.style.animationDuration = 1.8 + Math.random() * 1.2 + "s";
+      piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+      container.appendChild(piece);
+    }
+    // toast + cleanup
+    if (typeof showToast === "function") showToast("All tests passed ✓");
+    setTimeout(() => container.remove(), 3400);
+  };
+
+  // Konami-ish trigger: type "pass"
+  let buffer = "";
+  document.addEventListener("keydown", (e) => {
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
+    buffer = (buffer + e.key.toLowerCase()).slice(-4);
+    if (buffer === "pass") {
+      fire();
+      buffer = "";
+    }
+  });
+
+  // also expose so the test console can trigger it when it finishes
+  window.__celebrate = fire;
+})();

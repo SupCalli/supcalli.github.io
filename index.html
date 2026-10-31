@@ -468,6 +468,10 @@
               <li>
                 <span class="contact__icon" aria-hidden="true">✉️</span>
                 <a href="mailto:benzrodrigo07@gmail.com">benzrodrigo07@gmail.com</a>
+                <button type="button" class="copy-btn" id="copyEmail"
+                        data-copy="benzrodrigo07@gmail.com" aria-label="Copy email address">
+                  <span class="copy-btn__icon" aria-hidden="true">⧉</span>
+                </button>
               </li>
               <li>
                 <span class="contact__icon" aria-hidden="true">📱</span>
@@ -523,6 +527,18 @@
   </footer>
 
   <button class="to-top" id="toTop" aria-label="Back to top" hidden>↑</button>
+
+  <nav class="dot-nav" id="dotNav" aria-label="Section navigation">
+    <a href="#about" data-dot="about"><span></span><em>About</em></a>
+    <a href="#skills" data-dot="skills"><span></span><em>Skills</em></a>
+    <a href="#experience" data-dot="experience"><span></span><em>Experience</em></a>
+    <a href="#projects" data-dot="projects"><span></span><em>Projects</em></a>
+    <a href="#education" data-dot="education"><span></span><em>Education</em></a>
+    <a href="#interests" data-dot="interests"><span></span><em>Interests</em></a>
+    <a href="#contact" data-dot="contact"><span></span><em>Contact</em></a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>
