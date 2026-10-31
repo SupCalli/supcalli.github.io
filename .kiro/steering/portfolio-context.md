@@ -106,6 +106,42 @@ These are the high-value items that matter more than more features/animation:
 4. Create a proper OG preview image (1200×630) instead of using the tall portrait.
 5. Optional polish: copy-to-clipboard on email, smooth color fade on theme switch, Lighthouse pass.
 
+## Portfolio projects to build (globally marketable QA automation)
+
+Goal: replace the academic projects in the Projects section with real, public GitHub repos
+that prove in-demand QA automation skills. Three focused repos with great READMEs beat many
+half-finished ones. Each repo must have: a clear README (what it tests, how to run, a results
+screenshot, CI badge), clean structure (Page Object Model, no hard-coded waits, reusable
+fixtures), CI running and visibly green, and a short "what I learned / would improve" note.
+
+### Tier 1 — build these first (cover ~80% of what recruiters check)
+1. UI E2E framework — Playwright + TypeScript. Test a public demo site (saucedemo.com or
+   automationexercise.com): login, cart, checkout, negative cases. Show Page Object Model,
+   fixtures, multi-browser config, screenshots/trace on failure. HIGHEST-DEMAND sample.
+2. API testing suite — test a public API (restful-booker, reqres.in): CRUD, status/schema
+   validation, auth, data-driven tests. Playwright API testing OR Python + pytest + requests.
+3. CI/CD pipeline — add GitHub Actions to the above repos: run tests on push, publish HTML
+   report, show green badge in README. Leverages owner's Jenkins/GitLab experience.
+
+### Tier 2 — make you stand out
+4. BDD framework — Robot Framework or Cucumber/Gherkin, readable Given/When/Then. Plays to
+   owner's current Robot Framework experience at Infor.
+5. Performance testing starter — k6 or JMeter load test against a public API + short write-up.
+6. Visual regression or accessibility testing — Playwright screenshot comparison, or axe-core.
+
+### Tier 3 — advanced / senior signal (only after Tier 1-2 solid)
+7. Contract testing (Pact), Docker-containerized test runs, or a test-data generation utility.
+
+### Recommended starting point for Benedict
+Start with #1 (Playwright + TypeScript E2E) + #3 (GitHub Actions), then add #2 (API) as a
+second repo. This combo is the most universally recognized proof for a mid-level QA automation
+role and complements the Robot Framework work experience (framework variety reads well).
+Alternatively lead with Robot Framework (#4) since it's closest to the day job at Infor.
+
+Kiro can scaffold any of these on request (e.g. a Playwright + TS framework testing
+saucedemo.com with POM, a GitHub Actions workflow, and a recruiter-ready README), then link it
+from the Projects section of the portfolio.
+
 ## Working notes
 
 - Shell is PowerShell on Windows (even though labeled bash). Use `;` not `&&`.
